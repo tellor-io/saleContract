@@ -1,7 +1,13 @@
-pragma solidity >=0.5.19;
+pragma solidity ^0.5.0;
+
+//add SafeMath?
+import "./TokenInterface.sol";
+import "./SafeMath.sol";
 
 contract TellorCommunitySale{
-  address public owner;
+  using SafeMath for uint256;
+
+  address payable public owner;
   uint public tribPrice;
   uint public endDate;
   uint public saleAmount;
@@ -11,8 +17,8 @@ contract TellorCommunitySale{
   mapping(address => bool) withdrawn;
 
 
-  event NewPrice(uint price);
-  event NewAddress(address newAddress);
+  event NewPrice(uint _price);
+  event NewAddress(address _newAddress, uint _amount);
   event NewSale(address _buyer,uint _amount);
 
   constructor(address _Tellor) public {
@@ -32,7 +38,7 @@ contract TellorCommunitySale{
 
   function enterAddress(address _address, uint _amount) external restricted{
     require(withdrawn[_address] == false);
-    require(checkThisAddressTokens > saleAmount + _amount);
+    require(checkThisAddressTokens() > saleAmount.add(_amount));
     saleAmount += _amount;
     saleByAddress[_address] = _amount;
     emit NewAddress(_address,_amount);
@@ -51,8 +57,8 @@ contract TellorCommunitySale{
 
   function () external payable{
     require(!withdrawn[msg.sender]);
-    require(msg.value >= tribPrice * saleByAddress[msg.sender]);//are decimals an issue?
-    tellor.transfer(msg.sender,saleByAddress[msg.sender])
+    require(msg.value >= tribPrice.mul(saleByAddress[msg.sender]));//are decimals an issue?
+    tellor.transfer(msg.sender,saleByAddress[msg.sender]);
     withdrawn[msg.sender] = true;
     emit NewSale(msg.sender,saleByAddress[msg.sender]);
   }    
@@ -67,8 +73,8 @@ contract TellorCommunitySale{
     return withdrawn[_addr];
   }
 
-  function checkThisAddressTokens() external view returns(uint){
-    return Tellor.balanceOf(address(this));
+  function checkThisAddressTokens() public view returns(uint){
+    return tellor.balanceOf(address(this));
   }
 
 }
