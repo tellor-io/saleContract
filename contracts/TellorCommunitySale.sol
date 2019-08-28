@@ -1,6 +1,5 @@
 pragma solidity ^0.5.0;
 
-//add SafeMath?
 import "./TokenInterface.sol";
 import "./SafeMath.sol";
 
@@ -50,7 +49,6 @@ contract TellorCommunitySale{
   }
 
   function withdrawETH() external restricted{
-   require(now > endDate);
    address(owner).transfer(address(this).balance);
   }
 
@@ -58,7 +56,7 @@ contract TellorCommunitySale{
   function () external payable{
     require(!withdrawn[msg.sender]);
     require(msg.value >= tribPrice.mul(saleByAddress[msg.sender]));//are decimals an issue?
-    tellor.transfer(msg.sender,saleByAddress[msg.sender]);
+    tellor.transfer(msg.sender,saleByAddress[msg.sender]*1e18);
     withdrawn[msg.sender] = true;
     emit NewSale(msg.sender,saleByAddress[msg.sender]);
   }    
