@@ -58,7 +58,7 @@ contract ERC20{
     }
 
 
-    function _mint(address account, uint256 amount) internal {
+    function _mint(address account, uint256 amount) public {
         require(account != address(0), "ERC20: mint to the zero address");
 
         _totalSupply = _totalSupply.add(amount);
