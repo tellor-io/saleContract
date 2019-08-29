@@ -28,6 +28,10 @@ contract TellorCommunitySale{
     event NewSale(address _buyer,uint _amount);
 
     /*Constructor*/
+    /*
+    * @dev This sets the sale period to 7 days, and the TellorMaster address for the interface
+    * @param _Tellor is the TellorMaster address
+    */
     constructor(address _Tellor) public {
         owner = msg.sender;
         endDate = now + 7 days;
