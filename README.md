@@ -13,3 +13,28 @@
 # Sale Contract
 
 This contracted is intended to help miners buy the 1000 Tributes necessary for staking and becoming part of the Tellor network.
+
+
+# Testing
+Open two git terminals
+
+On one terminal run:
+
+```bash
+git clone https://github.com/tellor-io/saleContract
+cd saleContract
+npm install
+truffle compile
+```
+
+On the second termial run:
+
+```bash  
+Ganache-cli -a=16
+```
+
+On the first terminal run:
+
+```bash
+truffle test
+```
