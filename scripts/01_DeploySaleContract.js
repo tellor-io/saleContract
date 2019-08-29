@@ -1,7 +1,7 @@
 
 /**
-* @title Sale Contract Approve addresses function
-* @dev This allows Tellor approve an address for Tribute sales
+* @title Deploy Sale Contract 
+* @dev This allows Tellor deploy the community sale contract
 */
 
 /*Imports*/
@@ -13,6 +13,9 @@ function sleep_s(secs) {
   secs = (+new Date) + secs * 1000;
   while ((+new Date) < secs);
 }
+
+/*notes for validating contract
+//solc: 0.5.8+commit.23d335f2.Emscripten.clang
 
 /*Variables*/
 //rinkeby

@@ -1,6 +1,6 @@
 /**
-* @title Sale Contract Approve addresses function
-* @dev This allows Tellor approve an address for Tribute sales
+* @title Set Price per Tribute
+* @dev This allows Tellor set the price per Tribute in ETH
 */
 
 /*Imports*/
@@ -12,6 +12,7 @@ function sleep_s(secs) {
   secs = (+new Date) + secs * 1000;
   while ((+new Date) < secs);
 }
+
 
 /*Variables*/
 

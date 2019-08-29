@@ -1,7 +1,7 @@
 
 /**
-* @title Sale Contract withdraw left over Tributes
-* @dev This allows Tellor to withdraw left over Tributes
+* @title Withdraw Tokens 
+* @dev This allows Tellor to withdraw left over Tributes after the sale ends
 */
 
 /*Imports*/

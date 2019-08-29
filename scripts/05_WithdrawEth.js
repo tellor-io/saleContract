@@ -1,6 +1,6 @@
 
 /**
-* @title Sale Contract withdraw ETH
+* @title Withdraw ETH
 * @dev This allows Tellor to withdraw ETH
 */
 

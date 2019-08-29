@@ -1,6 +1,6 @@
 
 /**
-* @title Sale Contract Approve addresses function
+* @title Approve address 
 * @dev This allows Tellor approve an address for Tribute sales
 */
 

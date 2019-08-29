@@ -27,6 +27,7 @@ contract TellorCommunitySale{
     event NewAddress(address _newAddress, uint _amount);
     event NewSale(address _buyer,uint _amount);
 
+
     /*Constructor*/
     /*
     * @dev This sets the sale period to 7 days, and the TellorMaster address for the interface
@@ -38,6 +39,7 @@ contract TellorCommunitySale{
         tellorAddress = _Tellor;
         tellor = TokenInterface(_Tellor);
     }
+
 
     /**
     * @dev Allows the contract owner(Tellor) to set the price per Tribute
@@ -85,6 +87,7 @@ contract TellorCommunitySale{
         require(msg.sender == owner);
         address(owner).transfer(address(this).balance);
     }
+    
 
     /**
     * @dev Allows the approved addresses to pay ETH and withdraw the authorized number of Tributes
