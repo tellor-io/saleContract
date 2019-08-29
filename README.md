@@ -12,7 +12,7 @@
 
 # Sale Contract
 
-This contracted is intended to help miners buy the 1000 Tributes necessary for staking and becoming part of the Tellor network.
+This contract is intended to help miners buy the 1000 Tributes necessary for staking and becoming part of the Tellor network.
 
 
 # Testing
