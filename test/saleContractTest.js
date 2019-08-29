@@ -47,85 +47,95 @@ contract('SaleTests', function(accounts) {
     beforeEach('Setup contract for each test', async function () {
         token = await Token.new();
         sale = await SaleContract.new(token.address);
-        await token._mint(accounts[0],15000e18)
+        await token._mint(accounts[0],web3.utils.toWei("15000",'ether'))
     });
 
     it("Get Owner,Tellor Address,EndDate", async function(){
-        let tellor = await sale.tellor()
-        assert.equal(tellor.address,token.address,"the Address should be correct");
+        let tellor = await sale.tellorAddress.call()
+        assert.equal(tellor,token.address,"the Address should be correct");
         let owner = await sale.owner();
         assert.equal(owner, accounts[0],"Owner Should Be correct");
         let endDate = await sale.endDate();
         assert(endDate > 0 , "End Date should be positive");
     });
     it("Enter Address and Get Sale Amount and GetSaleByAddress and checkThisAddressTokens", async function(){
-      await token.transfer(sale.address,15e18)
+      await token.transfer(sale.address,web3.utils.toWei("15",'ether'))
       saleBal = await sale.checkThisAddressTokens()
-      assert(saleBal == 15e18,"Address Balance should be correct")
-      sale.enterAddress(accounts[1],1e18)
+      assert(saleBal == web3.utils.toWei("15",'ether'),"Address Balance should be correct")
+      sale.enterAddress(accounts[1],web3.utils.toWei("1",'ether'))
       thisSale = await sale.getSaleByAddress(accounts[1])
-      assert(thisSale == 1e18,"getSaleByAddress should work")
-      assert(sale.saleAmount() == 1e18,"Sale Amount Should be correct")
+      assert(thisSale ==web3.utils.toWei("1",'ether') ,"getSaleByAddress should work")
+      assert(await sale.saleAmount() == web3.utils.toWei("1",'ether'),"Sale Amount Should be correct")
     });
     it("Set Price, Get tribPrice", async function(){
-      await sale.setPrice(3* 1/200 * 1e18)
-      assert(sale.tribPrice() == 3*1/200 * 1e18);
+      let p = 3/200
+      await sale.setPrice(web3.utils.toWei(p.toString(),'ether'))
+      assert(await sale.tribPrice() == web3.utils.toWei(p.toString(),'ether'),"Price should be correct");
     });  
 
     it("Withdraw Tokens Test", async function(){
-      await token.transfer(sale.address,15e18)
-      advanceTime(7*86400)
+      await token.transfer(sale.address,web3.utils.toWei("15",'ether'))
+      advanceTime(8*86400)
       bal1 = await token.balanceOf(accounts[0])
       await sale.withdrawTokens()
       bal2 = await token.balanceOf(accounts[0])
-      assert(bal1 + 15e18 == bal1, "withdraw tokens should work")
+      bal = web3.utils.fromWei(bal1,"ether")
+      assert(Number(bal) + 15 == 15000, "withdraw tokens should work")
     });
     it("Fallback Test and Withdraw ETH Test and did Withdraw", async function(){
-      await token.transfer(sale.address,15e18)
-      sale.enterAddress(accounts[1],15e18)
+      await token.transfer(sale.address,web3.utils.toWei("15",'ether'))
+      await sale.enterAddress(accounts[1],10)
       let bal1 = await web3.eth.getBalance(accounts[0])
-      sale.sendTransaction({from:accounts[1],value:web3.toWei(10,"ether")})
-      let balA = await web3.eth.getBalance(address)
-      assert(balA == web3.toWei(10,"ether"))
+        bal1 = web3.utils.fromWei(bal1,'ether')
+      await web3.eth.sendTransaction({from:accounts[1],to:sale.address,value:web3.utils.toWei("1","ether")})
+      let balA = await web3.eth.getBalance(sale.address)
+      assert(balA == web3.utils.toWei("1","ether"),"contract should have 10 ETH")
       await sale.withdrawETH();
       let bal2 = await web3.eth.getBalance(accounts[0])
-      assert(bal1 + 9.9e18 >= bal2, "withdraw ETH should work")
+        bal2 = web3.utils.fromWei(bal2,'ether')
+      assert(Number(bal1) + .9 < Number(bal2), "withdraw ETH should work")
       assert(await sale.didWithdraw(accounts[1])==true, "Did Withdraw should work")
     });
     it("True Scenario Test - Sell 15e18 at 3$ a piece assuming 200$ ETH price", async function(){
-      await token.transfer(sale.address,15000e18)
-      await sale.setPrice(3* 1/200 * 1e18)
+      await token.transfer(sale.address,web3.utils.toWei("15000",'ether'))
+      let p = 3/200
+      await sale.setPrice(web3.utils.toWei(p.toString(),'ether'))
       saleBal = await sale.checkThisAddressTokens()
       for(var i = 1; i<=15;i++){
-        sale.enterAddress(accounts[i],1000e18)
+        await sale.enterAddress(accounts[i],1000)
       }
+      p= p*1000
       for(var i = 1; i<=15;i++){
-        sale.sendTransaction({from:accounts[i],value:web3.toWei(3000/200,"ether")})
-        bal = token.balanceOf(account[i])
-        assert(bal == 1000e18)
+        await web3.eth.sendTransaction({from:accounts[i],to:sale.address,value:web3.utils.toWei(p.toString(),"ether")})
+        bal = await token.balanceOf(accounts[i])
+        assert(bal == web3.utils.toWei("1000",'ether'))
         assert(await sale.didWithdraw(accounts[1])==true, "Did Withdraw should work")
       }
       saleBal = await sale.checkThisAddressTokens()
       assert(saleBal == 0,"Address Balance should be correct")
       let bal1 = await web3.eth.getBalance(accounts[0])
+      bal1 = web3.utils.fromWei(bal1,'ether')
       await sale.withdrawETH();
        let bal2 = await web3.eth.getBalance(accounts[0])
-      assert(bal1 + 14.900e18 >= bal2, "withdraw ETH should work")
+       bal2 = web3.utils.fromWei(bal2,'ether')
+      let totalETH = 15 * p
+      console.log("ETH Expected at 200$ price:  ",totalETH)
+      assert(Number(bal1) + totalETH >= Number(bal2), "withdraw ETH should work")
     });
     it("Test Throws - Unauthorized Sale", async function(){
-      await token.transfer(sale.address,15e18)
-      await sale.enterAddress(accounts[1],15e18)
+      await token.transfer(sale.address,web3.utils.toWei("15",'ether'))
+      await sale.enterAddress(accounts[1],1000)
       let bal1 = await web3.eth.getBalance(accounts[0])
-      await expectThrow(sale.sendTransaction({from:accounts[2],value:web3.utils.toWei(1,"ether")}))
+      await expectThrow(web3.eth.sendTransaction({from:accounts[2],to:sale.address,value:web3.utils.toWei("1","ether")}))
     });
     it("Test Throws All Restricted Functions", async function(){
       await expectThrow(sale.setPrice(1,{from:accounts[2]}))
-      await token.transfer(sale.address,15e18)
-      await expectThrow( sale.enterAddress(accounts[1],15e18,{from:accounts[4]})  )
+      await token.transfer(sale.address,web3.utils.toWei("15",'ether'))
+      await expectThrow( sale.enterAddress(accounts[1],web3.utils.toWei("15",'ether'),{from:accounts[4]})  )
       advanceTime(7*86400)
       await expectThrow(sale.withdrawTokens({from:accounts[2]}))
-      await sale.enterAddress(accounts[1],15e18)
-      await sale.sendTransaction({from:accounts[1],value:web3.toWei(3000/200,"ether")})
+      await sale.enterAddress(accounts[1],10)
+      await web3.eth.sendTransaction({from:accounts[1],to:sale.address,value:web3.utils.toWei("5","ether")})
       await expectThrow(sale.withdrawETH({from:accounts[3]}))
     });
 

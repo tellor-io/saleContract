@@ -10,6 +10,7 @@ contract TellorCommunitySale{
   uint public tribPrice;
   uint public endDate;
   uint public saleAmount;
+  address public tellorAddress;
   TokenInterface tellor;
 
   mapping(address => uint) saleByAddress;
@@ -23,19 +24,20 @@ contract TellorCommunitySale{
   constructor(address _Tellor) public {
     owner = msg.sender;
     endDate = now + 7 days;
+    tellorAddress = _Tellor;
     tellor = TokenInterface(_Tellor);
   }
 
-  modifier restricted() {
-    if (msg.sender == owner) _;
-  }
 
-  function setPrice(uint _price) external restricted {
+  function setPrice(uint _price) external {
+    require(msg.sender == owner);
     tribPrice = _price;
     emit NewPrice(_price);
+
   }
 
-  function enterAddress(address _address, uint _amount) external restricted{
+  function enterAddress(address _address, uint _amount) external {
+    require(msg.sender == owner);
     require(withdrawn[_address] == false);
     require(checkThisAddressTokens() > saleAmount.add(_amount));
     saleAmount += _amount;
@@ -43,18 +45,21 @@ contract TellorCommunitySale{
     emit NewAddress(_address,_amount);
   }
 
-  function withdrawTokens() external restricted{
+  function withdrawTokens() external{
+    require(msg.sender == owner);
     require(now > endDate);
     tellor.transfer(owner,tellor.balanceOf(address(this)));
   }
 
-  function withdrawETH() external restricted{
+  function withdrawETH() external{
+    require(msg.sender == owner);
    address(owner).transfer(address(this).balance);
   }
 
 
   function () external payable{
     require(!withdrawn[msg.sender]);
+    require (saleByAddress[msg.sender] > 0);
     require(msg.value >= tribPrice.mul(saleByAddress[msg.sender]));//are decimals an issue?
     tellor.transfer(msg.sender,saleByAddress[msg.sender]*1e18);
     withdrawn[msg.sender] = true;
