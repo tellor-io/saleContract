@@ -111,10 +111,13 @@ contract('SaleTests', function(accounts) {
       await token.transfer(sale.address,web3.utils.toWei("15000",'ether'))
       let p = 3/200
       await sale.setPrice(web3.utils.toWei(p.toString(),'ether'))
+      console.log("after set price")
       saleBal = await sale.checkThisAddressTokens()
+      console.log("before enter address")
       for(var i = 1; i<=15;i++){
         await sale.enterAddress(accounts[i],1000)
       }
+      console.log("after enter address")
       p= p*1000
       for(var i = 1; i<=15;i++){
         await web3.eth.sendTransaction({from:accounts[i],to:sale.address,value:web3.utils.toWei(p.toString(),"ether")})
