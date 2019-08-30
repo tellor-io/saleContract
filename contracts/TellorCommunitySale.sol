@@ -20,7 +20,6 @@ contract TellorCommunitySale{
     TokenInterface tellor;
 
     mapping(address => uint) saleByAddress;
-    mapping(address => bool) withdrawn;
 
     /*Events*/
     event NewPrice(uint _price);
@@ -61,10 +60,9 @@ contract TellorCommunitySale{
     */
     function enterAddress(address _address, uint _amount) external {
         require(msg.sender == owner);
-        require(withdrawn[_address] == false);
-        require(checkThisAddressTokens() > saleAmount.add(_amount));
+        require(checkThisAddressTokens()/1e18 > saleAmount.add(_amount));
         saleAmount += _amount;
-        saleByAddress[_address] = _amount;
+        saleByAddress[_address] += _amount;
         emit NewAddress(_address,_amount);
     }
 
@@ -93,12 +91,11 @@ contract TellorCommunitySale{
     * @dev Allows the approved addresses to pay ETH and withdraw the authorized number of Tributes
     */
     function () external payable{
-        require(!withdrawn[msg.sender]);
         require (saleByAddress[msg.sender] > 0);
         require(msg.value >= tribPrice.mul(saleByAddress[msg.sender]));//are decimals an issue?
-        withdrawn[msg.sender] = true;
         tellor.transfer(msg.sender,saleByAddress[msg.sender]*1e18); 
         emit NewSale(msg.sender,saleByAddress[msg.sender]);
+        saleByAddress[msg.sender] = 0;
     }    
 
 
@@ -114,19 +111,17 @@ contract TellorCommunitySale{
 
 
     /**
-    * @dev Checks if the approved party withdrew the amount of Tributes authorized
-    * @param _address of approved party
-    */
-    function didWithdraw(address _address) external view returns(bool){
-        return withdrawn[_address];
-    }
-
-
-    /**
     * @dev Checks if this contract has enough Tributes before approving more addresses 
     */
     function checkThisAddressTokens() public view returns(uint){
         return tellor.balanceOf(address(this));
     }
 
+
+    /**
+    * @dev Gives the user the price for their assigned tokens
+    */
+    function priceForUserTokens(address _address) public view returns(uint){
+        return tribPrice.mul(saleByAddress[_address]);
+    }
 }

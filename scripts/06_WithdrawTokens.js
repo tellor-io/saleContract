@@ -15,7 +15,7 @@ function sleep_s(secs) {
 }
 
 /*Variables*/
-var sale_address = '';
+var sale_address = '0xc3Bc04c971281321f197ce12AdAd15872027c840';
 
 module.exports =async function(callback) {
     let sale;

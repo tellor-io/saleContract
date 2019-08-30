@@ -16,10 +16,10 @@ function sleep_s(secs) {
 
 
 /*Variables*/
-var sale_address = '';
-var partyAddress = '';
-var amount= ;
-var addressCount = ;//address count - 1
+var sale_address = '0xc3Bc04c971281321f197ce12AdAd15872027c840';
+var partyAddress = '0x0d7EFfEFdB084DfEB1621348c8C70cc4e871Eba4';
+var amount= 1000;
+
 
 module.exports =async function(callback) {
     let sale;
