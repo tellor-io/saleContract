@@ -115,7 +115,7 @@ contract('SaleTests', function(accounts) {
       saleBal = await sale.checkThisAddressTokens()
       console.log("before enter address")
       for(var i = 1; i<=15;i++){
-        await sale.enterAddress(accounts[i],1000)
+          await sale.enterAddress(accounts[i],1000)
       }
       console.log("after enter address")
       p= p*1000
@@ -138,7 +138,7 @@ contract('SaleTests', function(accounts) {
       assert(Number(bal1) + totalETH >= Number(bal2), "withdraw ETH should work")
     });
     it("Test Throws - Unauthorized Sale", async function(){
-      await token.transfer(sale.address,web3.utils.toWei("15",'ether'))
+      await token.transfer(sale.address,web3.utils.toWei("1000",'ether'))
       console.log(1)
       await sale.enterAddress(accounts[1],1000)
       console.log(2)
@@ -149,13 +149,13 @@ contract('SaleTests', function(accounts) {
       await expectThrow(web3.eth.sendTransaction({from:accounts[2],to:sale.address,value:web3.utils.toWei("1","ether")}))
     });
     it("Test Throws All Restricted Functions", async function(){
-      await expectThrow(sale.setPrice(1,{from:accounts[2]}))
+      await expectThrow(sale.setPrice(web3.utils.toWei("1",'ether'),{from:accounts[2]}))
       await token.transfer(sale.address,web3.utils.toWei("15",'ether'))
-      await expectThrow( sale.enterAddress(accounts[1],web3.utils.toWei("15",'ether'),{from:accounts[4]})  )
-      advanceTime(7*86400)
+      await expectThrow( sale.enterAddress(accounts[1],15,{from:accounts[4]})  )
+      advanceTime(8*86400)
       await expectThrow(sale.withdrawTokens({from:accounts[2]}))
       await sale.enterAddress(accounts[1],10)
-      await web3.eth.sendTransaction({from:accounts[1],to:sale.address,value:web3.utils.toWei("5","ether")})
+      await web3.eth.sendTransaction({from:accounts[1],to:sale.address,value:web3.utils.toWei("10","ether")})
       await expectThrow(sale.withdrawETH({from:accounts[3]}))
     });
 

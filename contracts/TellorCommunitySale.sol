@@ -60,7 +60,7 @@ contract TellorCommunitySale{
     */
     function enterAddress(address _address, uint _amount) external {
         require(msg.sender == owner);
-        require(checkThisAddressTokens()/1e18 > saleAmount.add(_amount));
+        require(checkThisAddressTokens()/1e18 >= saleAmount.add(_amount));
         saleAmount += _amount;
         saleByAddress[_address] += _amount;
         emit NewAddress(_address,_amount);
